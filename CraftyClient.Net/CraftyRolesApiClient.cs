@@ -14,19 +14,11 @@ public partial class CraftyApiClient
             .AddUrlSegment("id", id));
 
     public async Task<CreateRoleResponse> CreateRole(string name,
-        (string serverId, ServerPermissions permissions)[]? servers = null)
-    {
-        var adjustedServers =
-            (servers ?? Array.Empty<(string serverId, ServerPermissions permissions)>());
-            /*
-            .Select(s =>
-                (s.serverId, Convert.ToString((int)s.permissions, 2)));*/
-
-        return await ExecuteAsync<CreateRoleResponse>(new RestRequest("api/v2/roles", Method.Post)
+        (string serverId, ServerPermissions permissions)[]? servers = null) =>
+        await ExecuteAsync<CreateRoleResponse>(new RestRequest("api/v2/roles", Method.Post)
             .AddJsonBody(new
             {
                 name,
-                servers = adjustedServers
+                servers = servers ?? []
             }));
-    }
 }

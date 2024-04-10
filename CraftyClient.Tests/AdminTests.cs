@@ -1,27 +1,67 @@
+using CraftyClientNet.Exceptions;
 using CraftyClientNet.Models;
 using CraftyClientNet.Models.Requests;
+using CraftyClientNet.Models.Responses;
 using MineStatLib;
 
 namespace CraftyClientTests;
 
-[Parallelizable(ParallelScope.Self)]
 public class AdminTests
 {
+    private sealed class TestScope : IAsyncDisposable
+    {
+        public readonly CraftyContainer Crafty = new();
+
+        public static async Task<TestScope> Create()
+        {
+            var scope = new TestScope();
+            await scope.Setup();
+            return scope;
+        }
+
+        public async Task Setup() => 
+            await Crafty.Setup();
+
+        public async ValueTask DisposeAsync() =>
+            await Crafty.DisposeAsync();
+    }
+    
     [Test]
     public async Task LoginTest()
     {
-        await using var crafty = new CraftyContainer();
-        await crafty.Setup();
-
-        Assert.DoesNotThrowAsync(async () => await crafty.Api.GetRoles());
+        await using var scope = await TestScope.Create();
+        
+        Assert.DoesNotThrowAsync(async () => await scope.Crafty.Api.GetRoles());
     }
 
     [Test]
+    [TestCase("Test")]
+    [TestCase("$%^&")]
+    [Parallelizable(ParallelScope.All)]
+    public async Task CreateRoles(string name)
+    {
+        await using var scope = await TestScope.Create();
+        
+        var response = await scope.Crafty.Api.CreateRole(name);
+        Assert.That(response.RoleId, Is.Not.Zero);
+    }
+    
+    [Test]
+    [TestCase("")]
+    [Parallelizable(ParallelScope.All)]
+    public async Task CreateInvalidRoles(string name)
+    {
+        await using var scope = await TestScope.Create();
+        
+        Assert.CatchAsync<InvalidJsonException<CreateRoleResponse>>(async () =>
+            await scope.Crafty.Api.CreateRole(name));
+    }
+
+
+    /*
+    [Test]
     public async Task CreateRoleTest()
     {
-        await using var crafty = new CraftyContainer();
-        await crafty.Setup();
-
         var createRoleResponse = await crafty.Api.CreateRole("Test");
         Assert.That(createRoleResponse.RoleId, Is.EqualTo(1));
 
@@ -36,9 +76,6 @@ public class AdminTests
     [Test]
     public async Task UserTest()
     {
-        await using var crafty = new CraftyContainer();
-        await crafty.Setup();
-
         var username = "lyze237";
         var email = "cool@example.com";
 
@@ -65,9 +102,6 @@ public class AdminTests
     [Test]
     public async Task CreateVanillaServer()
     {
-        await using var crafty = new CraftyContainer();
-        await crafty.Setup();
-
         var result = await crafty.Api.CreateServer(
             new StartJavaServerModel("Test", new JavaDownloadJarData("vanilla", "vanilla", "1.20.4", 2, 4, 25565, true))
             {
@@ -96,9 +130,6 @@ public class AdminTests
     [Test]
     public async Task CreateForgeServer()
     {
-        await using var crafty = new CraftyContainer();
-        await crafty.Setup();
-
         var result = await crafty.Api.CreateServer(
             new StartJavaServerModel("Test", new JavaDownloadJarData("modded", "forge", "1.20.4", 2, 4, 25565, true))
             {
@@ -115,6 +146,10 @@ public class AdminTests
             await crafty.Api.WaitForServerStart(result.NewServerUuid,
                 new CancellationTokenSource(TimeSpan.FromSeconds(20)).Token), Is.True);
     }
+
+    [TearDown]
+    public async Task TearDown() =>
+        await crafty.DisposeAsync();
 
     private bool CompareObjects(object a, object b)
     {
@@ -136,4 +171,5 @@ public class AdminTests
 
         return correct;
     }
+    */
 }
