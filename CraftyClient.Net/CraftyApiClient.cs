@@ -39,8 +39,7 @@ public partial class CraftyApiClient : ICraftyApiClient
                     Converters =
                     {
                         new FlagsToBitStringConverter(),
-                        new JsonStringEnumConverter(namingPolicy: JsonNamingPolicy.SnakeCaseLower),
-                        new AutoNumberToStringConverter(),
+                        new JsonStringEnumConverter(namingPolicy: JsonNamingPolicy.SnakeCaseLower)
                     },
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 }));

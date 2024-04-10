@@ -5,10 +5,8 @@ namespace CraftyClientNet.Converters;
 
 public class AutoNumberToStringConverter : JsonConverter<object>
 {
-    public override bool CanConvert(Type typeToConvert)
-    {
-        return typeof(string) == typeToConvert;
-    }
+    public override bool CanConvert(Type typeToConvert) =>
+        typeof(string) == typeToConvert;
 
     public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

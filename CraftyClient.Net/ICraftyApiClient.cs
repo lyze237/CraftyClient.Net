@@ -13,6 +13,8 @@ public interface ICraftyApiClient : IDisposable
     Task<CreateRoleResponse> CreateRole(string name, (string serverId, ServerPermissions permissions)[]? servers = null);
     
     Task<StartServerResponse> CreateServer(StartServerModel server);
+    Task<bool> WaitForServerImport(string serverId, CancellationToken cancellationToken);
+    Task<bool> WaitForServerStart(string serverId, CancellationToken cancellationToken);
     Task<ServerStatsResponse> GetServerStats(string serverId);
     Task<RestResponse> SendActionToServer(string serverId, ServerAction action);
 

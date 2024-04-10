@@ -1,4 +1,7 @@
-﻿namespace CraftyClientNet.Models.Responses;
+﻿using System.Text.Json.Serialization;
+using CraftyClientNet.Converters;
+
+namespace CraftyClientNet.Models.Responses;
 
 public record ServerStatsResponse(
     int StatsId,
@@ -7,7 +10,7 @@ public record ServerStatsResponse(
     string Started,
     bool Running,
     double Cpu,
-    string Mem,
+    [property: JsonConverter(typeof(AutoNumberToStringConverter))] string Mem,
     double MemPercent,
     string WorldName,
     string WorldSize,
