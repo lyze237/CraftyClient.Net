@@ -1,9 +1,24 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using CraftyClientNet.Converters;
+using CraftyClientNet.Extensions;
+using CraftyClientNet.Models;
+using CraftyClientNet.Models.Permissions;
+using RestSharp;
 
-namespace CraftyClientNet.Models.Responses;
+namespace CraftyClientNet.Endpoints.Server;
 
-public record ServerStatsResponse(
+public static class GetServerStats
+{
+    public record Request(string ServerId);
+
+    public class Handler(Request server) : ICraftyRequestHandler<Response>
+    {
+        public RestRequest GenerateRequest() =>
+            new RestRequest("api/v2/servers/{id}/stats")
+                            .AddUrlSegment("id", server.ServerId);
+    }
+
+    public record Response(
     int StatsId,
     DateTime Created,
     Server ServerId,
@@ -26,8 +41,8 @@ public record ServerStatsResponse(
     bool WaitingStart,
     bool FirstRun,
     bool Crashed,
-    bool Importing
-);
+    bool Importing);
+}
 
 public record Server(
     string ServerId,

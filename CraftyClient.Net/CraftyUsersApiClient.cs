@@ -1,24 +1,21 @@
-﻿using CraftyClientNet.Models.Requests;
-using CraftyClientNet.Models.Responses;
-using RestSharp;
+﻿using CraftyClientNet.Endpoints.Users;
 
 namespace CraftyClientNet;
 
 public partial class CraftyApiClient
 {
-    public Task<BasicUserResponse[]> GetUsers() => 
-        ExecuteAsync<BasicUserResponse[]>(new RestRequest("api/v2/users"));
+    public async Task<GetUsers.Response[]> GetUsers() =>
+        await ExecuteAsync(new GetUsers.Handler());
 
-    public Task<CreateUserResponse> CreateUser(CreateUserModel user) =>
-        ExecuteAsync<CreateUserResponse>(new RestRequest("api/v2/users", Method.Post)
-            .AddJsonBody(user));
+    public async Task<CreateUser.Response> CreateUser(CreateUser.Request user) =>
+        await ExecuteAsync(new CreateUser.Handler(user));
+    
+    public async Task<GetUser.Response> GetUser(GetUser.Request user) =>
+        await ExecuteAsync(new GetUser.Handler(user));
+    
+    public async Task<DeleteUser.Response> DeleteUser(DeleteUser.Request user) =>
+        await ExecuteAsync(new DeleteUser.Handler(user));
 
-    public Task<ExtendedUserResponse> GetUser(int userId) =>
-        ExecuteAsync<ExtendedUserResponse>(new RestRequest("api/v2/users/{id}").AddUrlSegment("id", userId));
-
-    public Task DeleteUser(int userId) => 
-        ExecuteAsync(new RestRequest("api/v2/users/{id}", Method.Delete).AddUrlSegment("id", userId));
-
-    public Task<GetUserPermissionsResponse> GetUserPermissions(int userId) =>
-        ExecuteAsync<GetUserPermissionsResponse>(new RestRequest("api/v2/users/{id}/permissions").AddUrlSegment("id", userId));
+    public async Task<GetUserPermissions.Response> GetUserPermissions(GetUserPermissions.Request user) =>
+        await ExecuteAsync(new GetUserPermissions.Handler(user));
 }

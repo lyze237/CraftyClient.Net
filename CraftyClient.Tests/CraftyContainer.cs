@@ -9,7 +9,7 @@ namespace CraftyClientTests;
 public class CraftyContainer : IAsyncDisposable
 {
     private IContainer container = null!;
-    public ICraftyApiClient Api { get; private set; } = null!;
+    public CraftyApiClient Api { get; private set; } = null!;
 
     public int JavaPort => container.GetMappedPublicPort(25565);
 

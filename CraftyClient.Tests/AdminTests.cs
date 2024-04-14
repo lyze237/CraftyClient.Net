@@ -1,8 +1,9 @@
+using CraftyClientNet.Endpoints;
+using CraftyClientNet.Endpoints.Roles;
+using CraftyClientNet.Endpoints.Users;
 using CraftyClientNet.Exceptions;
-using CraftyClientNet.Models;
-using CraftyClientNet.Models.Requests;
 using CraftyClientNet.Models.Responses;
-using MineStatLib;
+using RestSharp;
 
 namespace CraftyClientTests;
 
@@ -42,7 +43,7 @@ public class AdminTests
     {
         await using var scope = await TestScope.Create();
         
-        var response = await scope.Crafty.Api.CreateRole(name);
+        var response = await scope.Crafty.Api.CreateRole(new CreateRole.Request(name));
         Assert.That(response.RoleId, Is.Not.Zero);
     }
     
@@ -54,11 +55,52 @@ public class AdminTests
         await using var scope = await TestScope.Create();
         
         Assert.CatchAsync<InvalidJsonException<CreateRoleResponse>>(async () =>
-            await scope.Crafty.Api.CreateRole(name));
+            await scope.Crafty.Api.CreateRole(new CreateRole.Request(name)));
     }
 
+    [Test]
+    [TestCase("test", "securepassword123!", "test1@example.com")]
+    [TestCase("test2", "securepassword123!", "test2@example.com")]
+    [TestCase("test3", "securepassword123!", "test3@example.com")]
+    [Parallelizable(ParallelScope.All)]
+    public async Task CreateUser(string username, string password, string email)
+    {
+        await using var scope = await TestScope.Create();
+
+        var response = await scope.Crafty.Api.ExecuteAsync(new CreateUser.Handler(new CreateUser.Request(username, password, email)));
+        Assert.That(response.UserId, Is.Not.Zero);
+    }
 
     /*
+    [Test]
+    public async Task UserTest()
+    {
+        await using var scope = await TestScope.Create();
+        var crafty = scope.Crafty;
+        
+        var username = "lyze237";
+        var email = "cool@example.com";
+
+        var user = await crafty.Api.CreateUser(new CreateUser.Request(username, "coolpw123!", email,
+            ServerCreationPermission: 2));
+        var users = await crafty.Api.GetUsers();
+
+        Assert.That(users.Select(u => u.UserId).ToArray(), Does.Contain(user.UserId));
+        Assert.That(users.Select(u => u.Username).ToArray(), Does.Contain(username));
+
+        var extendedUser = await crafty.Api.GetUser(new GetUser.Request(user.UserId));
+        Assert.That(extendedUser.Username, Is.EqualTo(username));
+        Assert.That(extendedUser.Email, Is.EqualTo(email));
+
+        var userPermissions = await crafty.Api.GetUserPermissions(new GetUserPermissions.Request(user.UserId));
+
+        await crafty.Api.DeleteUser(new DeleteUser.Request(user.UserId));
+        users = await crafty.Api.GetUsers();
+        Assert.That(users.Select(u => u.UserId).ToArray(), Does.Not.Contain(user.UserId));
+
+        Console.WriteLine(users);
+    }
+
     [Test]
     public async Task CreateRoleTest()
     {
@@ -73,31 +115,6 @@ public class AdminTests
         Assert.That(rolesResponse.First(), Is.EqualTo(roleResponse));
     }
 
-    [Test]
-    public async Task UserTest()
-    {
-        var username = "lyze237";
-        var email = "cool@example.com";
-
-        var user = await crafty.Api.CreateUser(new CreateUserModel(username, "coolpw123!", email,
-            ServerCreationPermission: 2));
-        var users = await crafty.Api.GetUsers();
-
-        Assert.That(users.Select(u => u.UserId).ToArray(), Does.Contain(user.UserId));
-        Assert.That(users.Select(u => u.Username).ToArray(), Does.Contain(username));
-
-        var extendedUser = await crafty.Api.GetUser(user.UserId);
-        Assert.That(extendedUser.Username, Is.EqualTo(username));
-        Assert.That(extendedUser.Email, Is.EqualTo(email));
-
-        var userPermissions = await crafty.Api.GetUserPermissions(user.UserId);
-
-        await crafty.Api.DeleteUser(user.UserId);
-        users = await crafty.Api.GetUsers();
-        Assert.That(users.Select(u => u.UserId).ToArray(), Does.Not.Contain(user.UserId));
-
-        Console.WriteLine(users);
-    }
 
     [Test]
     public async Task CreateVanillaServer()

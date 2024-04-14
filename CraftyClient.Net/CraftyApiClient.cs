@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml;
 using CraftyClientNet.auth;
 using CraftyClientNet.Converters;
 using CraftyClientNet.Extensions;
@@ -44,6 +43,9 @@ public partial class CraftyApiClient : ICraftyApiClient
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 }));
     }
+
+    public async Task<TResponse> ExecuteAsync<TResponse>(ICraftyRequestHandler<TResponse> handler) => 
+        await ExecuteAsync<TResponse>(handler.GenerateRequest());
 
     private async Task<TData> ExecuteAsync<TData>(RestRequest request)
     {

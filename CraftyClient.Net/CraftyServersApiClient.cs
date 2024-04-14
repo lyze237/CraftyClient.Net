@@ -1,5 +1,4 @@
-﻿using CraftyClientNet.Extensions;
-using CraftyClientNet.Models;
+﻿using CraftyClientNet.Endpoints.Server;
 using CraftyClientNet.Models.Requests;
 using CraftyClientNet.Models.Responses;
 using RestSharp;
@@ -16,7 +15,7 @@ public partial class CraftyApiClient
     {
         while (true)
         {
-            var response = await GetServerStats(serverId);
+            var response = await GetServerStats(new GetServerStats.Request(serverId));
             if (!response.Importing)
             {
                  await Task.Delay(5000); // Apparently crafty does some stuff after import = false, so let's wait a couple seconds to make sure it's actually done importing.
@@ -34,7 +33,7 @@ public partial class CraftyApiClient
     {
         while (true)
         {
-            var response = await GetServerStats(serverId);
+            var response = await GetServerStats(new GetServerStats.Request(serverId));
             if (response.Running)
             {
                  await Task.Delay(5000); // Apparently crafty does some stuff after import = false, so let's wait a couple seconds to make sure it's actually done importing.
@@ -48,13 +47,9 @@ public partial class CraftyApiClient
         }
     }
 
-    public async Task<ServerStatsResponse> GetServerStats(string id) =>
-        await ExecuteAsync<ServerStatsResponse>(
-            new RestRequest("api/v2/servers/{id}/stats")
-                .AddUrlSegment("id", id));
+    public async Task<GetServerStats.Response> GetServerStats(GetServerStats.Request server) => 
+        await ExecuteAsync(new GetServerStats.Handler(server));
 
-    public async Task<RestResponse> SendActionToServer(string serverId, ServerAction action) =>
-        await ExecuteAsync(new RestRequest("api/v2/servers/{id}/action/{action}", Method.Post)
-            .AddUrlSegment("id", serverId)
-            .AddUrlSegment("action", action.To_snake_case()));
+    public async Task<SendActionToServer.Response> SendActionToServer(SendActionToServer.Request action) => 
+        await ExecuteAsync(new SendActionToServer.Handler(action));
 }
