@@ -6,6 +6,7 @@ using MineStatLib;
 
 namespace CraftyClientTests;
 
+[Parallelizable(ParallelScope.All)]
 public class ServerTests : CraftyTest
 {
     [Test]
@@ -74,7 +75,7 @@ public class ServerTests : CraftyTest
                 Autostart = true
             });
 
-        await scope.Crafty.Api.WaitForServerDone(server.NewServerUuid, new CancellationTokenSource(TimeSpan.FromSeconds(20)).Token);
+        await scope.Crafty.Api.WaitForServerDone(server.NewServerUuid, new CancellationTokenSource(TimeSpan.FromSeconds(60)).Token);
         
         await scope.Crafty.Api.SendStdInToServer(new SendStdInToServer.Request(server.NewServerUuid, "say kajwlhdkjawhdawjdhakjwhgdkjhawgdka"));
 
@@ -96,7 +97,7 @@ public class ServerTests : CraftyTest
                 Autostart = true
             });
 
-        await scope.Crafty.Api.WaitForServerDone(server.NewServerUuid, new CancellationTokenSource(TimeSpan.FromSeconds(20)).Token);
+        await scope.Crafty.Api.WaitForServerDone(server.NewServerUuid, new CancellationTokenSource(TimeSpan.FromSeconds(60)).Token);
         
         var mineStat = new MineStat("localhost", (ushort)scope.Crafty.JavaPort);
 
@@ -126,14 +127,14 @@ public class ServerTests : CraftyTest
 
         Assert.That(
             await crafty.Api.WaitForServerImport(result.NewServerUuid,
-                new CancellationTokenSource(TimeSpan.FromSeconds(20)).Token), Is.True);
+                new CancellationTokenSource(TimeSpan.FromSeconds(60)).Token), Is.True);
 
         await crafty.Api.SendActionToServer(new SendActionToServer.Request(result.NewServerUuid,
             SendActionToServer.ServerAction.StartServer));
 
         Assert.That(
             await crafty.Api.WaitForServerStart(result.NewServerUuid,
-                new CancellationTokenSource(TimeSpan.FromSeconds(20)).Token), Is.True);
+                new CancellationTokenSource(TimeSpan.FromSeconds(60)).Token), Is.True);
 
         return result;
     }

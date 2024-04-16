@@ -36,5 +36,6 @@ public interface ICraftyApiClient : IDisposable
     Task<GetUser.Response> GetUser(GetUser.Request request);
     Task<DeleteUser.Response> DeleteUser(DeleteUser.Request request);
     Task<GetUserPermissions.Response> GetUserPermissions(GetUserPermissions.Request request);
+    
     // Task ModifyUser();
 }
