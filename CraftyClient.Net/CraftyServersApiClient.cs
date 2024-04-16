@@ -12,9 +12,9 @@ public partial class CraftyApiClient
     public async Task<GetServers.Response[]> GetServers() =>
         await ExecuteAsync(new GetServers.Handler());
 
-    public async Task<StartServerResponse> CreateServer(StartServerModel server) =>
+    public async Task<StartServerResponse> CreateServer(StartServerModel request) =>
         await ExecuteAsync<StartServerResponse>(new RestRequest("api/v2/servers", Method.Post)
-            .AddJsonBody(server));
+            .AddJsonBody(request));
 
     public async Task<bool> WaitForServerImport(string serverId, CancellationToken cancellationToken)
     {
@@ -87,4 +87,7 @@ public partial class CraftyApiClient
 
     public async Task<string[]> GetServerLogs(GetServerLogs.Request request) =>
         await ExecuteAsync(new GetServerLogs.Handler(request));
+
+    public async Task<GetServerPublicData.Response> GetServerPublicData(GetServerPublicData.Request request) =>
+        await ExecuteAsync(new GetServerPublicData.Handler(request));
 }

@@ -20,7 +20,7 @@ public interface ICraftyApiClient : IDisposable
     
     
     Task<GetServers.Response[]> GetServers();
-    Task<StartServerResponse> CreateServer(StartServerModel server);
+    Task<StartServerResponse> CreateServer(StartServerModel request);
     Task<bool> WaitForServerImport(string serverId, CancellationToken cancellationToken);
     Task<bool> WaitForServerStart(string serverId, CancellationToken cancellationToken);
     Task<GetServerStats.Response> GetServerStats(GetServerStats.Request request);
@@ -29,10 +29,12 @@ public interface ICraftyApiClient : IDisposable
     Task<SendStdInToServer.Response> SendStdInToServer(SendStdInToServer.Request request);
     Task<string[]> GetServerLogs(GetServerLogs.Request request);
 
+    Task<GetServerPublicData.Response> GetServerPublicData(GetServerPublicData.Request request);
+
     Task<GetUsers.Response[]> GetUsers();
-    Task<CreateUser.Response> CreateUser(CreateUser.Request user);
-    Task<GetUser.Response> GetUser(GetUser.Request user);
-    Task<DeleteUser.Response> DeleteUser(DeleteUser.Request user);
-    Task<GetUserPermissions.Response> GetUserPermissions(GetUserPermissions.Request user);
+    Task<CreateUser.Response> CreateUser(CreateUser.Request request);
+    Task<GetUser.Response> GetUser(GetUser.Request request);
+    Task<DeleteUser.Response> DeleteUser(DeleteUser.Request request);
+    Task<GetUserPermissions.Response> GetUserPermissions(GetUserPermissions.Request request);
     // Task ModifyUser();
 }

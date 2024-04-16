@@ -29,6 +29,21 @@ public class ServerTests : CraftyTest
     }
 
     [Test]
+    public async Task GetPublicServerData()
+    {
+        await using var scope = await TestScope.Create();
+
+        var server = await SpinUpServer(scope.Crafty,
+            new StartJavaServerModel("Test", new JavaDownloadJarData("vanilla", "vanilla", "1.20.4", 2, 4, 25565, true))
+            {
+                Autostart = true
+            });
+
+        var response = await scope.Crafty.Api.GetServerPublicData(new GetServerPublicData.Request(server.NewServerUuid));
+        Assert.That(response.ServerId, Is.EqualTo(server.NewServerUuid));
+    }
+
+    [Test]
     public async Task DeleteServer()
     {
         await using var scope = await TestScope.Create();
